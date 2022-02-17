@@ -5,3 +5,4 @@ Error: error deleting EC2 VPC (vpc-xxxxxxxxx): DependencyViolation: The vpc 'vpc
        status code: 400, request id: dcebc7a2-6b40-475a-8cf9-bd58ef165967
 ```
 Also you can use script "find_dependencies.sh" to find all resources associated with the VPC. Replace VPC ID before executing.
+https://aws.amazon.com/ru/premiumsupport/knowledge-center/troubleshoot-dependency-error-delete-vpc/
