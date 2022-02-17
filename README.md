@@ -15,10 +15,9 @@ terraform destroy --var-file=terraform-demo.tfvars
 
 **If destroy operation will end up with error as below you need manually delete VPC resource from AWS console.**
 
-<font color="red">
-Error: error deleting EC2 VPC (vpc-xxxxxxxxx): DependencyViolation: The vpc 'vpc-xxxxxxxx' has dependencies and cannot be deleted.
-       status code: 400, request id: dcebc7a2-6b40-475a-8cf9-bd58ef165967
-</font>
+<font color="red">Error: error deleting EC2 VPC (vpc-xxxxxxxxx): DependencyViolation: The vpc 'vpc-xxxxxxxx' has dependencies and cannot be deleted.</font>
+       <font color="red">status code: 400, request id: dcebc7a2-6b40-475a-8cf9-bd58ef165967</font>
+
 
 https://aws.amazon.com/ru/premiumsupport/knowledge-center/troubleshoot-dependency-error-delete-vpc/
 
