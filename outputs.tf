@@ -7,3 +7,8 @@ output "cluster_status" {
   description = "Status of the EKS cluster. One of `CREATING`, `ACTIVE`, `DELETING`, `FAILED`"
   value       = module.eks.cluster_status
 }
+
+output "cluster_name" {
+  value = module.eks.cluster_name
+}
+

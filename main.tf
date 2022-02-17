@@ -52,7 +52,6 @@ resource "aws_security_group" "additional" {
   }
 }
 
-
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "~> 18.0"
@@ -81,4 +80,8 @@ module "eks" {
       }
     }
   }
+}
+
+module "k8s_deploy" {
+  source = "./modules/k8s_deploy"
 }
