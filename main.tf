@@ -1,11 +1,5 @@
 provider "aws" {
-  region = local.region
-}
-
-locals {
-  name            = "eks-${var.env_prefix}"
-  cluster_version = "1.21"
-  region          = "eu-central-1"
+  region = "eu-central-1"
 }
 
 data "aws_availability_zones" "available_azs" {}
@@ -14,25 +8,25 @@ module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "~> 3.0"
 
-  name = local.name
-  cidr = "10.0.0.0/16"
+  name = "${var.env_prefix}-eks"
+  cidr = var.vpc_cidr_block
 
   azs             = data.aws_availability_zones.available_azs.zone_ids
-  private_subnets = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-  public_subnets  = ["10.0.4.0/24", "10.0.5.0/24", "10.0.6.0/24"]
+  private_subnets = var.private_subnets
+  public_subnets  = var.public_subnets
 
   enable_nat_gateway   = true
   single_nat_gateway   = true
   enable_dns_hostnames = true
 
   public_subnet_tags = {
-    "kubernetes.io/cluster/${local.name}" = "shared"
-    "kubernetes.io/role/elb"              = 1
+    "kubernetes.io/cluster/${var.env_prefix}-eks-cluster" = "shared"
+    "kubernetes.io/role/elb"                              = 1
   }
 
   private_subnet_tags = {
-    "kubernetes.io/cluster/${local.name}" = "shared"
-    "kubernetes.io/role/internal-elb"     = 1
+    "kubernetes.io/cluster/${var.env_prefix}-eks-cluster" = "shared"
+    "kubernetes.io/role/internal-elb"                     = 1
   }
 }
 
@@ -45,9 +39,7 @@ resource "aws_security_group" "additional" {
     to_port   = 22
     protocol  = "tcp"
     cidr_blocks = [
-      "10.0.0.0/8",
-      "172.16.0.0/12",
-      "192.168.0.0/16",
+      var.vpc_cidr_block
     ]
   }
 }
@@ -57,7 +49,7 @@ module "eks" {
   version = "~> 18.0"
 
   cluster_name                    = "${var.env_prefix}-eks-cluster"
-  cluster_version                 = "1.21"
+  cluster_version                 = var.k8s_cluster_version
   cluster_endpoint_private_access = true
   cluster_endpoint_public_access  = true
 
@@ -74,7 +66,7 @@ module "eks" {
       launch_template_name   = ""
 
       instance_types = var.instance_types
-      capacity_type  = "ON_DEMAND"
+      capacity_type  = var.k8s_worker_capacity_type
       remote_access = {
         ec2_ssh_key = var.ec2_ssh_key
       }
@@ -82,6 +74,16 @@ module "eks" {
   }
 }
 
+data "aws_eks_cluster" "cluster" {
+  name = module.eks.cluster_id
+}
+
+data "aws_eks_cluster_auth" "cluster" {
+  name = module.eks.cluster_id
+}
 module "k8s_deploy" {
-  source = "./modules/k8s_deploy"
+  source                     = "./modules/k8s_deploy"
+  k8s_cluster_endpoint       = data.aws_eks_cluster.cluster.endpoint
+  k8s_cluster_token          = data.aws_eks_cluster_auth.cluster.token
+  k8s_cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority[0].data)
 }

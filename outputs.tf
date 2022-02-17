@@ -9,6 +9,6 @@ output "cluster_status" {
 }
 
 output "cluster_name" {
-  value = module.eks.cluster_name
+  value = module.eks.cluster_id
 }
 

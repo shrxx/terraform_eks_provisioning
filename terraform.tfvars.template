@@ -1,0 +1,10 @@
+# Example
+vpc_cidr_block           = "10.0.0.0/16"
+private_subnets          = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+public_subnets           = ["10.0.4.0/24", "10.0.5.0/24", "10.0.6.0/24"]
+env_prefix               = "dev"
+instance_types           = ["t3.small"]
+public_key_location      = "/home/user/.ssh"
+ec2_ssh_key              = "user_ec2_key"
+k8s_cluster_version      = "1.21"
+k8s_worker_capacity_type = "ON_DEMAND"
